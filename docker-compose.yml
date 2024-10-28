@@ -1,0 +1,44 @@
+# Optionally, keep this version if it's not causing issues
+
+services:
+  app:
+    build: .
+    container_name: nestjs_blockchain_app
+    ports:
+      - '3307:3306'  # Using SERVER_PORT value
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      NODE_ENV: development  # Set to development
+    restart: unless-stopped
+    networks:
+      - blockchain_network
+    security_opt:
+      - no-new-privileges:true
+
+  db:
+    image: mysql:5.7
+    container_name: blockchain_mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - '3307:3306'
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - blockchain_network
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  blockchain_network:
+    driver: bridge
+
+volumes:
+  db_data:
